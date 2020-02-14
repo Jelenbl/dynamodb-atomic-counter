@@ -15,6 +15,8 @@ var DEFAULT_TABLE_NAME = 'AtomicCounters',
 	DEFAULT_KEY_ATTRIBUTE = 'id',
 	
 	DEFAULT_SORT_KEY_ATTRIBUTE = 'sk',
+	
+	DEFAULT_EPOCH_ATTRIBUTE = 'START_EPOCH',
 	/**
 	 * Default attribute name of the count value attribute.
 	 * The count attribute indicates the "last value" used in the last increment operation.
@@ -82,15 +84,18 @@ exports.increment = function ( counterId, options, rangeID ) {
 		},
 		keyAttribute = options.keyAttribute || DEFAULT_KEY_ATTRIBUTE,
 		sortkeyAttribute = options.sortkeyAttribute || DEFAULT_SORT_KEY_ATTRIBUTE,
+		
 		countAttribute = options.countAttribute || DEFAULT_COUNT_ATTRIBUTE,
+		epoch = options.epoch || DEFAULT_EPOCH_ATTRIBUTE
+		
 		errorFn = _.isFunction( options.error ) ? options.error : noop,
 		successFn = _.isFunction( options.success ) ? options.success : noop,
 		completeFn = _.isFunction( options.complete ) ? options.complete : noop;
 
 	params.Key[ keyAttribute ] = { S: counterId };
 	params.Key[ sortkeyAttribute ] = { S: rangeID };
-	let intValue = DEFAULT_INCREMENT//= _.isFunction( options.increment) || DEFAULT_INCREMENT  //= parseInt(options.increment)
-	console.log(options.increment)
+	let intValue = DEFAULT_INCREMENT
+	
 	if(options.increment){
 		intValue = options.increment
 	}
@@ -99,6 +104,13 @@ exports.increment = function ( counterId, options, rangeID ) {
 		Action: 'ADD',
 		Value: {
 			N: '' + (intValue)
+		}
+	};
+	
+	params.AttributeUpdates[ epoch ] = {
+		Action: 'ADD',
+		Value: {
+			N: '' + Date.now()
 		}
 	};
 	
