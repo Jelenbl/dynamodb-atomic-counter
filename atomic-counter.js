@@ -13,6 +13,8 @@ var DEFAULT_TABLE_NAME = 'AtomicCounters',
 	 * Default attribute name that will identify each counter.
 	 */
 	DEFAULT_KEY_ATTRIBUTE = 'id',
+	
+	DEFAULT_SORT_KEY_ATTRIBUTE = 'sk',
 	/**
 	 * Default attribute name of the count value attribute.
 	 * The count attribute indicates the "last value" used in the last increment operation.
@@ -67,7 +69,7 @@ exports.config = AWS.config;
  * @return {Request} A DynamoDB UpdateItem [request](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Request.html) object,
  *    with a [jQuery](http://api.jquery.com/category/deferred-object/) style promise interface applied to it.
  */
-exports.increment = function ( counterId, options ) {
+exports.increment = function ( counterId, options, rangeID ) {
 	options || ( options = {} );
 
 	var request,
@@ -79,18 +81,29 @@ exports.increment = function ( counterId, options ) {
 			TableName: options.tableName || DEFAULT_TABLE_NAME
 		},
 		keyAttribute = options.keyAttribute || DEFAULT_KEY_ATTRIBUTE,
+		sortkeyAttribute = options.sortkeyAttribute || DEFAULT_SORT_KEY_ATTRIBUTE,
 		countAttribute = options.countAttribute || DEFAULT_COUNT_ATTRIBUTE,
 		errorFn = _.isFunction( options.error ) ? options.error : noop,
 		successFn = _.isFunction( options.success ) ? options.success : noop,
 		completeFn = _.isFunction( options.complete ) ? options.complete : noop;
 
 	params.Key[ keyAttribute ] = { S: counterId };
+	params.Key[ sortkeyAttribute ] = { S: rangeID };
+	let intValue = DEFAULT_INCREMENT//= _.isFunction( options.increment) || DEFAULT_INCREMENT  //= parseInt(options.increment)
+	console.log(options.increment)
+	if(options.increment){
+		intValue = options.increment
+	}
+	
 	params.AttributeUpdates[ countAttribute ] = {
 		Action: 'ADD',
 		Value: {
-			N: '' + ( options.increment || DEFAULT_INCREMENT )
+			N: '' + (intValue)
 		}
 	};
+	
+	console.log(params)
+	
 	_.extend( params, options.dynamodb );
 
 	dynamo || ( dynamo = new AWS.DynamoDB() );
