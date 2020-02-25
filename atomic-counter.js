@@ -108,7 +108,7 @@ exports.increment = function ( counterId, options, rangeID ) {
 	};
 
 	params.AttributeUpdates[ epoch ] = {
-		Action: 'UPDATE',
+		Action: 'PUT',
 		Value: {
 			N: '' + Date.now()
 		}
