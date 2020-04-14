@@ -107,12 +107,14 @@ exports.increment = function ( counterId, options, rangeID ) {
 		}
 	};
 
-	params.AttributeUpdates[ epoch ] = {
-		Action: 'PUT',
-		Value: {
-			N: '' + Date.now()
-		}
-	};
+  if (!options.keepTimestamp) {
+    params.AttributeUpdates[ epoch ] = {
+      Action: 'PUT',
+      Value: {
+        N: '' + Date.now()
+      }
+    };
+  }
 
 	console.log(params)
 
