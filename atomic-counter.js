@@ -88,7 +88,9 @@ exports.increment = function ( counterId, options, rangeID ) {
 		countAttribute = options.countAttribute || DEFAULT_COUNT_ATTRIBUTE,
 		epoch = options.epoch || DEFAULT_EPOCH_ATTRIBUTE
 
-	errorFn = _.isFunction( options.error ) ? options.error : noop,
+		//version = options.version || null
+
+		errorFn = _.isFunction( options.error ) ? options.error : noop,
 		successFn = _.isFunction( options.success ) ? options.success : noop,
 		completeFn = _.isFunction( options.complete ) ? options.complete : noop;
 
@@ -112,6 +114,15 @@ exports.increment = function ( counterId, options, rangeID ) {
       Action: 'PUT',
       Value: {
         N: '' + Date.now()
+      }
+    };
+  }
+
+  if (options.version) {
+    params.AttributeUpdates[ 'VERSION' ] = {
+      Action: 'PUT',
+      Value: {
+        S: options.version
       }
     };
   }
